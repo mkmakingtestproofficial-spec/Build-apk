@@ -46,22 +46,28 @@ jobs:
           java-version: '17'
 
       
+      
+      - name: Generate Gradle Wrapper
+        run: |
+          set -eux
+          cd "$PROJECT_DIR"
+          gradle --version
+          gradle wrapper --gradle-version 8.9
+
       - name: Build APK
         run: |
           set -eux
           cd "$PROJECT_DIR"
-          if [ -f gradlew ]; then
-            chmod +x gradlew
-            ./gradlew assembleDebug --stacktrace
-          elif [ -f gradlew.bat ]; then
-            echo "พบเฉพาะ gradlew.bat ซึ่งใช้บน Windows"
-            exit 1
-          else
-            echo "ไม่พบ Gradle Wrapper ในโปรเจกต์"
-            echo "ค้นหาไฟล์ Gradle ที่มีอยู่:"
-            find . -maxdepth 4 -type f | sort | head -n 200
-            exit 1
-          fi
+          chmod +x gradlew
+          ./gradlew assembleDebug --stacktrace
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: FAH-CLIENT-APK
+          path: extracted/**/build/outputs/apk/debug/*.apk
+          if-no-files-found: error
+          
           
 
       - name: Upload APK
