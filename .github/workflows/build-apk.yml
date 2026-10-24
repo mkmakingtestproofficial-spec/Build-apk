@@ -45,12 +45,24 @@ jobs:
           distribution: temurin
           java-version: '17'
 
+      
       - name: Build APK
         run: |
           set -eux
           cd "$PROJECT_DIR"
-          chmod +x gradlew
-          ./gradlew assembleDebug --stacktrace
+          if [ -f gradlew ]; then
+            chmod +x gradlew
+            ./gradlew assembleDebug --stacktrace
+          elif [ -f gradlew.bat ]; then
+            echo "พบเฉพาะ gradlew.bat ซึ่งใช้บน Windows"
+            exit 1
+          else
+            echo "ไม่พบ Gradle Wrapper ในโปรเจกต์"
+            echo "ค้นหาไฟล์ Gradle ที่มีอยู่:"
+            find . -maxdepth 4 -type f | sort | head -n 200
+            exit 1
+          fi
+          
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
